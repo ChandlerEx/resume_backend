@@ -8,15 +8,15 @@ phases:
     commands:
       - echo "Checking for dependencies"
       - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-build:
-  commands:
-    - echo "Building SAM application"
-    - sam build --use-container
-    - sam package --s3-bucket ${DEPLOY_BUCKET} --output-template-file packaged.yaml
-    - echo "Listing directory contents:"
-    - ls -la
-    - echo "Checking if packaged.yaml exists:"
-    - test -f packaged.yaml && echo "packaged.yaml exists" || echo "packaged.yaml does not exist"
+  build:
+    commands:
+      - echo "Building SAM application"
+      - sam build --use-container
+      - sam package --s3-bucket ${DEPLOY_BUCKET} --output-template-file packaged.yaml
+      - echo "Listing directory contents:"
+      - ls -la
+      - echo "Checking if packaged.yaml exists:"
+      - test -f packaged.yaml && echo "packaged.yaml exists" || echo "packaged.yaml does not exist"
   post_build:
     commands:
       - echo "Build completed on `date`"
