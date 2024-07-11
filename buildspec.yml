@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  pre_build:
+    commands:
+      - echo "Installing dependencies"
+      - pip install -r requirements.txt
+  build:
+    commands:
+      - echo "Running tests"
+      - pytest
+      - echo "Packaging SAM application"
+      - sam package --template-file template.yaml --s3-bucket ${DEPLOY_BUCKET} --output-template-file packaged.yaml
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+
+artifacts:
+  files:
+    - packaged.yaml
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.cache/pip/**/*'
