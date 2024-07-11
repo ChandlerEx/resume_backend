@@ -8,6 +8,7 @@ phases:
     commands:
       - echo "Checking for dependencies"
       - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - echo "Deploy bucket is: ${DEPLOY_BUCKET}"
   build:
     commands:
       - echo "Building SAM application"
