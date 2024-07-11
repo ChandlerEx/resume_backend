@@ -1,9 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+
 Resources:
-  MyFunction:
+  HitCounterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      CodeUri: WebsiteHitCounter/
+      Handler: app.lambda_handler
       Runtime: python3.8
-      CodeUri: ./
+      Events:
+        HttpGet:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
