@@ -4,32 +4,38 @@ phases:
   install:
     runtime-versions:
       python: 3.8
+  
   pre_build:
     commands:
-      - echo "Checking for dependencies"
-      - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - echo "Checking credentials being used"
-      - aws sts get-caller-identity
-      - echo "Testing S3 bucket access..."
-      - aws s3 ls s3://chandler-backend-testing-bucket || { echo "Failed to access S3 bucket"; exit 1; }
+      - echo "Installing dependencies"
+      - pip install -r requirements.txt
+
   build:
     commands:
-      - aws s3 ls s3://chandler-backend-testing-bucket --region us-west-1 || echo "Failed to access bucket"
       - echo "Building SAM application"
       - sam build --use-container
-      - sam package --s3-bucket chandler-backend-testing-bucket --output-template-file packaged.yaml
-      - echo "Listing directory contents:"
-      - ls -la
-      - echo "Checking if packaged.yaml exists:"
-      - test -f packaged.yaml && echo "packaged.yaml exists" || echo "packaged.yaml does not exist"
+      - echo "Deploying SAM application"
+      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name hit-counter-stack --s3-bucket ${DEPLOY_BUCKET} --capabilities CAPABILITY_IAM --region us-west-1
+      
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo "Retrieving API Gateway URL"
+      - API_URL=$(aws cloudformation describe-stacks --stack-name hit-counter-stack --query 'Stacks[0].Outputs[?OutputKey==`WebsiteHitCounterApi`].OutputValue' --output text)
+      - echo $API_URL > api_url.txt
+      - aws s3 cp api_url.txt s3://cf-resume-site-share/api_url.txt
+      - echo "API Gateway URL is $API_URL"
+      - echo "Updating frontend configuration"
+      - sed -i "s|const API_URL = '.*'|const API_URL = '$API_URL'|" ./frontend/script.js
+      - echo "Syncing frontend to S3"
+      - aws s3 sync ./frontend s3://${WEBSITE_BUCKET} --delete
+      - echo "Invalidating CloudFront cache"
+      - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
 
 artifacts:
   files:
     - packaged.yaml
   discard-paths: yes
+
 cache:
   paths:
     - '/root/.cache/pip/**/*'

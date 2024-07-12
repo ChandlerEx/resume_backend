@@ -14,3 +14,8 @@ Resources:
           Properties:
             Path: /
             Method: get
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hit-counter"
