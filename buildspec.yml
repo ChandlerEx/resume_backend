@@ -24,8 +24,6 @@ phases:
       - echo $API_URL > api_url.txt
       - aws s3 cp api_url.txt s3://cf-resume-site-share/api_url.txt
       - echo "API Gateway URL is $API_URL"
-      - echo "Syncing frontend to S3"
-      - aws s3 sync ./frontend s3://${WEBSITE_BUCKET} --delete
       - echo "Invalidating CloudFront cache"
       - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
 
