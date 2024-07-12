@@ -1,27 +1,40 @@
 import boto3
+import json
+from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb').Table('site_hits')
 
 def lambda_handler(event, context):
     try:
+        # Try to update the item
         response = dynamodb.update_item(
             Key={'id': 'total_hits'},
             UpdateExpression='ADD hits :inc',
             ExpressionAttributeValues={':inc': 1},
             ReturnValues="UPDATED_NEW"
         )
-        new_count = str(response['Attributes']['hits'])
+        new_count = int(response['Attributes']['hits'])
+    except ClientError as e:
+        # If the item doesn't exist, create it
+        if e.response['Error']['Code'] == 'ValidationException':
+            response = dynamodb.put_item(
+                Item={'id': 'total_hits', 'hits': 1}
+            )
+            new_count = 1
+        else:
+            print(f"Unexpected error: {e.response['Error']['Message']}")
+            raise
     except Exception as e:
         print(f"Error: {str(e)}")
-        new_count = '0'
+        raise
 
     return {
-        'statusCode': 200 if new_count != '0' else 500,
+        'statusCode': 200,
         'headers': {
-            'Content-Type': 'text/plain',
+            'Content-Type': 'application/json',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,GET'
         },
-        'body': new_count
+        'body': json.dumps({'count': new_count})
     }
