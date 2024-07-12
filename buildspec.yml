@@ -14,8 +14,10 @@ phases:
     commands:
       - echo "Building SAM application"
       - sam build --use-container
+      - echo "Packaging SAM application"
+      - sam package --s3-bucket ${DEPLOY_BUCKET} --output-template-file packaged.yaml
       - echo "Deploying SAM application"
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name hit-counter-stack --s3-bucket ${DEPLOY_BUCKET} --capabilities CAPABILITY_IAM --region us-west-1
+      - sam deploy --template-file packaged.yaml --no-confirm-changeset --no-fail-on-empty-changeset --stack-name hit-counter-stack --capabilities CAPABILITY_IAM --region us-west-1
       
   post_build:
     commands:
@@ -26,10 +28,13 @@ phases:
       - echo "API Gateway URL is $API_URL"
       - echo "Invalidating CloudFront cache"
       - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
+      - echo "Checking if packaged.yaml exists..."
+      - ls -l packaged.yaml || echo "packaged.yaml not found"
 
 artifacts:
   files:
     - packaged.yaml
+    - api_url.txt
   discard-paths: yes
 
 cache:
