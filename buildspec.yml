@@ -24,8 +24,6 @@ phases:
       - echo $API_URL > api_url.txt
       - aws s3 cp api_url.txt s3://cf-resume-site-share/api_url.txt
       - echo "API Gateway URL is $API_URL"
-      - echo "Updating frontend configuration"
-      - sed -i "s|const API_URL = '.*'|const API_URL = '$API_URL'|" ./frontend/script.js
       - echo "Syncing frontend to S3"
       - aws s3 sync ./frontend s3://${WEBSITE_BUCKET} --delete
       - echo "Invalidating CloudFront cache"
