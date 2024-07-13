@@ -5,16 +5,16 @@ Resources:
   HitCounterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: WebsiteHitCounter/
+      CodeUri: ./
       Handler: app.lambda_handler
       Runtime: python3.8
       Events:
-        HttpGet:
+        HitCounterApi:
           Type: Api
           Properties:
             Path: /hit-counter
             Method: get
-        HttpOptions:
+        OptionsMethod:
           Type: Api
           Properties:
             Path: /hit-counter
@@ -33,6 +33,6 @@ Resources:
         AllowOrigin: "'*'"
 
 Outputs:
-  ApiUrl:
-    Description: "API Gateway endpoint URL for Prod stage"
+  HitCounterApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hit Counter function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hit-counter"
