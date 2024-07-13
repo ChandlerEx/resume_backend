@@ -18,6 +18,15 @@ Resources:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
 
+    HitCounterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'https://techchandler.com'"
+
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL for Prod stage"
