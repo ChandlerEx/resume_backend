@@ -7,14 +7,25 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.9
+      Events:
+        HitCounterApi:
+          Type: Api
+          Properties:
+            Path: /hit-counter
+            Method: get
+        OptionsMethod:
+          Type: Api
+          Properties:
+            Path: /hit-counter
+            Method: options
       Policies:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
 
-HitCounterApi:
-  Type: AWS::Serverless::Api
-  Properties:
+  HitCounterApi:
+    Type: AWS::Serverless::Api
+    Properties:
     StageName: Prod
     Cors:
       AllowMethods: "'GET,OPTIONS'"
