@@ -29,8 +29,8 @@ Resources:
       StageName: Prod
       Cors:
         AllowMethods: "'GET,OPTIONS'"
-        AllowHeaders: "'Content-Type'"
-        AllowOrigin: "'https://techchandler.com'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
 
 Outputs:
   ApiUrl:
