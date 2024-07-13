@@ -12,13 +12,18 @@ Resources:
         HttpGet:
           Type: Api
           Properties:
-            Path: /
+            Path: /hit-counter
             Method: get
+        HttpOptions:
+          Type: Api
+          Properties:
+            Path: /hit-counter
+            Method: options
       Policies:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
 
-    HitCounterApi:
+  HitCounterApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
