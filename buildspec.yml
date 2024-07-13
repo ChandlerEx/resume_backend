@@ -22,14 +22,12 @@ phases:
   post_build:
     commands:
       - echo "Retrieving API Gateway URL"
-      - API_URL=$(aws cloudformation describe-stacks --stack-name hit-counter-stack --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text)
+      - API_URL=$(aws cloudformation describe-stacks --stack-name hit-counter-stack --query 'Stacks[0].Outputs[?OutputKey==`HitCounterApiUrl`].OutputValue' --output text)
       - echo $API_URL > api_url.txt
       - aws s3 cp api_url.txt s3://cf-resume-site-share/api_url.txt
       - echo "API Gateway URL is $API_URL"
       - echo "Invalidating CloudFront cache"
       - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
-      - echo "Checking if packaged.yaml exists..."
-      - ls -l packaged.yaml || echo "packaged.yaml not found"
 
 artifacts:
   files:
