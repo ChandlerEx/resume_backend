@@ -26,11 +26,11 @@ Resources:
   HitCounterApi:
     Type: AWS::Serverless::Api
     Properties:
-    StageName: Prod
-    Cors:
-      AllowMethods: "'GET,OPTIONS'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      AllowOrigin: "'*'"
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
 
   HitCounterFunctionPermission:
     Type: AWS::Lambda::Permission
