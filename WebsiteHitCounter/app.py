@@ -12,6 +12,14 @@ def lambda_handler(event, context):
         'Access-Control-Allow-Methods': 'OPTIONS,GET'
     }
 
+    # Handle OPTIONS request
+    if event.get('httpMethod') == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps('OK')
+        }
+
     try:
         # Try to update the item
         response = dynamodb.update_item(

@@ -8,17 +8,6 @@ Resources:
       CodeUri: ./
       Handler: app.lambda_handler
       Runtime: python3.8
-      Events:
-        HitCounterApi:
-          Type: Api
-          Properties:
-            Path: /hit-counter
-            Method: get
-        OptionsMethod:
-          Type: Api
-          Properties:
-            Path: /hit-counter
-            Method: options
       Policies:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
@@ -27,12 +16,37 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      Cors:
-        AllowMethods: "'GET,OPTIONS'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title:
+            Ref: AWS::StackName
+        paths:
+          /hit-counter:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HitCounterFunction.Arn}/invocations
+              responses: {}
+            options:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HitCounterFunction.Arn}/invocations
+              responses: {}
+
+  HitCounterFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HitCounterFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HitCounterApi}/*/*/*"
 
 Outputs:
-  HitCounterApi:
+  HitCounterApiUrl:
     Description: "API Gateway endpoint URL for Prod stage for Hit Counter function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hit-counter"
+    Value: !Sub "https://${HitCounterApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hit-counter"
