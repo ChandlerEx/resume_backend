@@ -12,31 +12,14 @@ Resources:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
 
-  HitCounterApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Prod
-      DefinitionBody:
-        swagger: '2.0'
-        info:
-          title:
-            Ref: AWS::StackName
-        paths:
-          /hit-counter:
-            get:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HitCounterFunction.Arn}/invocations
-              responses: {}
-            options:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HitCounterFunction.Arn}/invocations
-              responses: {}
+HitCounterApi:
+  Type: AWS::Serverless::Api
+  Properties:
+    StageName: Prod
+    Cors:
+      AllowMethods: "'GET,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
   HitCounterFunctionPermission:
     Type: AWS::Lambda::Permission
