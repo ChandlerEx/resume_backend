@@ -8,7 +8,9 @@ phases:
   pre_build:
     commands:
       - echo "Installing dependencies"
+      - cd WebsiteHitCounter
       - pip install -r requirements.txt
+      - cd ..
 
   build:
     commands:

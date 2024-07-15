@@ -5,7 +5,7 @@ Resources:
   HitCounterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./
+      CodeUri: ./WebsiteHitCounter
       Handler: app.lambda_handler
       Runtime: python3.9
       Policies:
