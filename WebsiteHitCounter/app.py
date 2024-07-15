@@ -14,9 +14,16 @@ def lambda_handler(event, context):
     headers = {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'OPTIONS,GET'
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS'
     }
+
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps('Success')
+        }
 
     try:
         # Try to update the item
@@ -38,10 +45,18 @@ def lambda_handler(event, context):
             new_count = 1
         else:
             logger.error(f"Unexpected DynamoDB error: {str(e)}")
-            raise
+            return {
+                'statusCode': 500,
+                'headers': headers,
+                'body': json.dumps({'error': str(e)})
+            }
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        raise
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'error': str(e)})
+        }
 
     return {
         'statusCode': 200,
