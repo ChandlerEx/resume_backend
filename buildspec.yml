@@ -24,6 +24,8 @@ phases:
       - echo "Packaging SAM application"
       - sam package --s3-bucket ${DEPLOY_BUCKET} --output-template-file packaged.yaml
       - echo "Deploying SAM application"
+      - aws sts get-caller-identity
+      - aws iam list-attached-role-policies --role-name NewResumeBackendCodeBuildRole
       - sam deploy --template-file packaged.yaml --no-confirm-changeset --no-fail-on-empty-changeset --stack-name hit-counter-stack --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region us-west-1
       
   post_build:
