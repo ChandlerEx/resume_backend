@@ -8,20 +8,16 @@ Resources:
       CodeUri: ./
       Handler: app.lambda_handler
       Runtime: python3.9
-      Events:
-        HitCounterApi:
-          Type: Api
-          Properties:
-            Path: /hit-counter
-            Method: GET
-        OptionsMethod:
-          Type: Api
-          Properties:
-            Path: /hit-counter
-            Method: OPTIONS
       Policies:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HitCounterApi
+            Path: /hit-counter
+            Method: GET
 
   HitCounterApi:
     Type: AWS::Serverless::Api
@@ -31,14 +27,6 @@ Resources:
         AllowMethods: "'GET,OPTIONS'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
-
-  HitCounterFunctionPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref HitCounterFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HitCounterApi}/*/*/*"
 
 Outputs:
   HitCounterApiUrl:
