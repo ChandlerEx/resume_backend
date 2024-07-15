@@ -13,12 +13,12 @@ Resources:
           Type: Api
           Properties:
             Path: /hit-counter
-            Method: get
+            Method: GET
         OptionsMethod:
           Type: Api
           Properties:
             Path: /hit-counter
-            Method: options
+            Method: OPTIONS
       Policies:
         - AWSLambda_FullAccess
         - AmazonDynamoDBFullAccess
