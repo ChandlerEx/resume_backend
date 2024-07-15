@@ -12,13 +12,18 @@ phases:
 
   build:
     commands:
-      - echo "Checking if stack exists and is in ROLLBACK_COMPLETE state"
+      - echo "Checking stack status"
       - |
-        if aws cloudformation describe-stacks --stack-name hit-counter-stack --region us-west-1 2>&1 | grep -q 'ROLLBACK_COMPLETE'; then
-          echo "Deleting existing stack in ROLLBACK_COMPLETE state"
-          aws cloudformation delete-stack --stack-name hit-counter-stack --region us-west-1
-          aws cloudformation wait stack-delete-complete --stack-name hit-counter-stack --region us-west-1
-        fi
+        STACK_STATUS=$(aws cloudformation describe-stacks --stack-name hit-counter-stack --region us-west-1 --query 'Stacks[0].StackStatus' --output text 2>&1 || echo "STACK_NOT_FOUND")
+        if [ "$STACK_STATUS" = "UPDATE_ROLLBACK_FAILED" ]; then
+         echo "Stack is in UPDATE_ROLLBACK_FAILED state. Attempting to continue update rollback..."
+         aws cloudformation continue-update-rollback --stack-name hit-counter-stack --region us-west-1
+         aws cloudformation wait stack-update-complete --stack-name hit-counter-stack --region us-west-1
+        elif [ "$STACK_STATUS" = "ROLLBACK_COMPLETE" ]; then
+         echo "Deleting existing stack in ROLLBACK_COMPLETE state"
+         aws cloudformation delete-stack --stack-name hit-counter-stack --region us-west-1
+         aws cloudformation wait stack-delete-complete --stack-name hit-counter-stack --region us-west-1
+       fi
       - echo "Building SAM application"
       - sam build --use-container
       - echo "Packaging SAM application"
