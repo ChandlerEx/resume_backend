@@ -14,8 +14,8 @@ def lambda_handler(event, context):
     headers = {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Methods': 'GET,OPTIONS'
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Methods': '*'
     }
 
     if event['httpMethod'] == 'OPTIONS':
